@@ -35,13 +35,13 @@ But here is a general overview explanation of how the modified version for my pr
 4. **40hz Low Pass filter**
 - This filter ensures that we aren't reading any waves above 40hz as it is unnecessary and could contain noise. For the project, I chose to limit movement to a binary choice. Thus, I chose the 2 brainwaves out of 5 that had the most common activations and hertz ranges. That being Beta(12-30hz) & Gamma(30+hz). Thus anything higher than 40hz was not needed. This also has the added benefit of removing any potential muscle movements from, say, the eyebrows. 
 
-5. 1 hz High pass filter
+5. **1 hz High pass filter**
 - Similarly, along the lines of the previous filter. Instead of removing any extreme high-end frequencies, we do the same for low-end frequencies.
 
-6. 2nd 60Hz Notch filter & gain stage
+6. **2nd 60Hz Notch filter & gain stage**
 - Unfortunately, I was unable to implement a 120hz filter to achieve a cascading power line removal system. So, I added another 60hz filter and a potentiometer to control gain. To either strengthen or weaken the signal.
 
-7. Analog to Digital Conversion
+7. **Analog to Digital Conversion**
 - This section is pretty self-explanatory. We use a part known as the ADS1115 for its differential mode. This allows us to measure the difference in voltage between our filtered signal and our ground. Which offers even another layer of noise cancellation. The ADS is also able to more precisiely capture signals than the arudino. Making it the perfect low cost effective part to convert our signal from analog to digital. 
 ### :bar_chart: Reading EEG Signals
 
