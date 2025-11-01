@@ -1,6 +1,6 @@
 # Whatcha Thinkin? 
 
-Whatcha thinkin is a brain computer inference that allows the user to control a 2d side scroller game using a custom-built EEG circuit. The user attaches the 3 electrodes, 2 on the forehead and one on tne earlobe and runs the game and EEG reading scripts. The game will run and then begin being controlled by the user's brainwaves. 
+Whatcha thinkin is a brain computer inference that allows the user to control a 2d side scroller game using a custom-built EEG circuit. The user attaches the 3 electrodes, 2 on the forehead and one on the earlobe and runs the game and EEG reading scripts. The game will run and then begin being controlled by the user's brainwaves. 
 
 Video demonstration of the project: [Live Demonstration](https://www.youtube.com/watch?v=aFaplhdCCEs)
 
