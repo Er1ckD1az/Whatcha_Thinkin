@@ -13,7 +13,7 @@ Video demonstration of the project: [Live Demonstration](https://www.youtube.com
 2. [Game Design](#Game-Design)
 
    
-## Circuit Design
+## :robot: Circuit Design
 
 1. [Hardware Design](#Hardware-Design)
 2. [Reading EEG Signals](#Reading-EEG-Signals)
