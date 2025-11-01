@@ -55,7 +55,6 @@ ax3.set_ylim(0, 1000)
 ax3.grid(True, alpha=0.3)
 
 def apply_bandpass_filter(data, lowcut, highcut, fs, order=4):
-    """Apply a Butterworth bandpass filter to the signal"""
     nyq = 0.5 * fs
     low = lowcut / nyq
     high = highcut / nyq
@@ -63,16 +62,14 @@ def apply_bandpass_filter(data, lowcut, highcut, fs, order=4):
     return signal.filtfilt(b, a, data)
 
 def compute_band_power(data, fft_result, freqs, low, high):
-    """Compute the power in a specific frequency band"""
     indices = np.where((freqs >= low) & (freqs <= high))[0]
     return np.sum(np.abs(fft_result[indices])**2) / len(indices) if len(indices) > 0 else 0
 
 def init():
-    """Initialize animation"""
     return line_time, line_fft, beta_bar, gamma_bar
 
-def update(frame):
-    """Update plots with new data"""
+#Update plots
+def update(frame): 
     current_time = time.time()
     data = np.array(list(EEG_buffer))
     times = np.array(list(time_buffer)) - current_time
@@ -108,12 +105,11 @@ def update(frame):
     return line_time, line_fft, beta_bar, gamma_bar
 
 def read_serial_data():
-    """Background thread to read data from serial port"""
     try:
         with serial.Serial(PORT, BAUD_RATE) as ser:
             print(f"Connected to {PORT} at {BAUD_RATE} baud")
             ser.flushInput()
-            time.sleep(2)  #Allow time for Arduino to reset
+            time.sleep(2)
             
             while True:
                 if ser.in_waiting:
@@ -125,7 +121,7 @@ def read_serial_data():
                             
                         #Parse data line
                         raw, voltage, filtered = map(float, line.split(','))
-                        EEG_buffer.append(filtered)  #We use the filtered data from Arduino
+                        EEG_buffer.append(filtered)
                         time_buffer.append(time.time())
                         
                     except (ValueError, IndexError) as e:
@@ -143,10 +139,11 @@ if __name__ == "__main__":
     serial_thread = threading.Thread(target=read_serial_data, daemon=True)
     serial_thread.start()
     
-    #Start animation - Fixed to avoid unbounded cache warning
+    #Start animation
     ani = FuncAnimation(fig, update, init_func=init, 
                        interval=100, blit=True, cache_frame_data=False)
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
 
     plt.show()
+
