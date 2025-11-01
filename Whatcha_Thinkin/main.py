@@ -18,13 +18,13 @@ def main():
     print("\nStarting in 3 seconds...")
     time.sleep(3)
     
-    # Get the current directory where main.py is located
+    #Get the current directory where main.py is located
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     eeg_script = os.path.join(current_dir, 'modified_eeg_processing.py')
     game_script = os.path.join(current_dir, 'final_game', 'modified_game.py')
     
-    # Verify files exist
+    #Verify if files exist
     if not os.path.exists(eeg_script):
         print(f"ERROR: {eeg_script} not found!")
         return
@@ -35,24 +35,24 @@ def main():
     print(f"Using EEG script: {eeg_script}")
     print(f"Using Game script: {game_script}")
     
-    # Start both processes
+    #Start both processes
     try:
-        # Start the EEG processing
+        #Start the EEG processing
         eeg_process = subprocess.Popen([sys.executable, eeg_script])
         print("EEG visualization started (PID: {})".format(eeg_process.pid))
         
-        # Wait a moment to ensure EEG processing has started
+        #Wait a moment to ensure EEG processing has started
         time.sleep(2)
         
-        # Start the game
+        #Start the game
         game_process = subprocess.Popen([sys.executable, game_script])
         print("Game started (PID: {})".format(game_process.pid))
         
-        # Monitor processes
+        #Monitor processes
         while eeg_process.poll() is None and game_process.poll() is None:
             time.sleep(0.5)
         
-        # If one process ends, terminate the other
+        #If one process ends, terminate the other
         if eeg_process.poll() is not None:
             print("EEG processing stopped, terminating game...")
             if os.name == 'nt':  
@@ -107,6 +107,7 @@ def main():
     
     finally:
         print("Both programs terminated. Thanks for playing!")
+
 
 
 main()
