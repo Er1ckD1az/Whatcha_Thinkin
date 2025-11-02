@@ -18,31 +18,56 @@ Video demonstration of the project: [Live Demonstration](https://www.youtube.com
 1. [Hardware Design](#Hardware-Design)
 2. [Reading EEG Signals](#Reading-EEG-Signals)
 
-### :satellite: Hardware Design
-Firstly, I would like to give proper credit to the original designer for the EEG circuit that I modified for this project. It can be found here: [EEG Circuit](https://www.instructables.com/DIY-EEG-and-ECG-Circuit/). Feel free to read it if you would like an even more in-depth explanation of it, and/or a price list if you wanted to create your own.
+### 🛰️ Hardware Design
 
-But here is a general overview explanation of how the modified version for my project works. My circuit can be broken down into 7 main components:
+Firstly, I’d like to give proper credit to the original designer of the EEG circuit that I modified for this project.  
+You can find it here: [EEG Circuit](https://www.instructables.com/DIY-EEG-and-ECG-Circuit/).  
+Feel free to check it out for a deeper explanation and a detailed parts list if you’d like to build your own.
 
-1. **Amplification**
-- Most crucial part of the circuit. This is where we actually read the EEG signals from the brain. The user attaches an electrode to the earlobe, which serves as our grounding electrode. The other two input electrodes are attached onto the forehead, which would be represented as Fp1 & Fp2 on an EEG node map. These nodes work best for the simplified nature of our machine. The reason that this section is the most important part is because EEG signals are very accute and thus we need a strong amplifier to be able to capture the signals properly. If the amp stage is not working, then the entire project does not. 
+Here is my modified circuits structure, which can be broken down into **seven main components**:
 
-2. **1st 60hz Notch filter**
-- Sections 2-6 serve to clean up and remove any possible noise, as it is important that our signal is represented accurately. As for the filter itself, it is designed to filter out the biggest source of noise in our circuit due to power line interference.
+#### 1️⃣ Amplification  
+- **Purpose:** Core stage where EEG signals are read directly from the brain.  
+- **Setup:**  
+  - One electrode on the **earlobe** (ground).  
+  - Two input electrodes on the **forehead (Fp1 & Fp2)** - ideal for our simplified EEG circuit.  
+- **Notes:**  
+  EEG signals are extremely faint, so amplification is critical. If this stage fails, the entire circuit becomes non-functional.
 
-3. **7hz High Pass filter**
-- This filter's purpose is to remove any galvanic skin response from the head. We want to account for the potential change of electrical properties of skin from factors such as sweat or oily skin.
+#### 2️⃣ 60 Hz Notch Filter (1st Stage)  
+- **Purpose:** Remove power line interference — the most common and strongest noise source in EEG circuits.  
+- **Notes:** This is the first of several filtering stages (2–6) that clean and stabilize the signal.
 
-4. **40hz Low Pass filter**
-- This filter ensures that we aren't reading any waves above 40hz as it is unnecessary and could contain noise. For the project, I chose to limit movement to a binary choice. Thus, I chose the 2 brainwaves out of 5 that had the most common activations and hertz ranges. That being Beta(12-30hz) & Gamma(30+hz). Thus anything higher than 40hz was not needed. This also has the added benefit of removing any potential muscle movements from, say, the eyebrows. 
 
-5. **1 hz High pass filter**
-- Similarly, along the lines of the previous filter. Instead of removing any extreme high-end frequencies, we do the same for low-end frequencies.
+#### 3️⃣ 7 Hz High-Pass Filter  
+- **Purpose:** Eliminate **galvanic skin response** noise caused by factors like sweat or oily skin.  
+- **Effect:** Keeps the signal stable by removing slow changing DC drifts from skin conductivity.
 
-6. **2nd 60Hz Notch filter & gain stage**
-- Unfortunately, I was unable to implement a 120hz filter to achieve a cascading power line removal system. So, I added another 60hz filter and a potentiometer to control gain. To either strengthen or weaken the signal.
+#### 4️⃣ 40 Hz Low-Pass Filter  
+- **Purpose:** Remove frequencies above 40 Hz to exclude unnecessary high-frequency noise.  
+- **Reasoning:**  
+  - My project focuses on **Beta (12–30 Hz)** and **Gamma (30+ Hz)** waves.  
+  - Anything above ~40 Hz likely includes **muscle artifacts** (ex. eyebrow movement), we're making an EEG not EKG machine.
 
-7. **Analog to Digital Conversion**
-- This section is pretty self-explanatory. We use a part known as the ADS1115 for its differential mode. This allows us to measure the difference in voltage between our filtered signal and our ground. Which offers even another layer of noise cancellation. The ADS is also able to more precisiely capture signals than the arudino. Making it the perfect low cost effective part to convert our signal from analog to digital. 
+
+#### 5️⃣ 1 Hz High-Pass Filter  
+- **Purpose:** Similarly to the low-pass filter it removes very low frequencies (drifts, slow body movement).  
+- **Effect:** Keeps the signal centered in the EEG’s meaningful frequency band.
+
+#### 6️⃣ 2nd 60 Hz Notch Filter & Gain Stage  
+- **Purpose:** Additional suppression of power line noise and manual gain adjustment.  
+- **Design Choice:**  
+  - Originally meant to be a 120hz filter for cascading suppression, but due to time constraints, I implemented another 60hz filter.  
+  - A **potentiometer** is also included to tune signal strength for best results.
+
+#### 7️⃣ Analog-to-Digital Conversion (ADC)  
+- **Component:** **ADS1115**, operating in **differential mode**.  
+- **Purpose:** Convert the clean analog EEG signal to a precise digital signal for the microcontroller.  
+- **Advantages:**  
+  - Measures voltage differences for built-in noise rejection.  
+  - Provides higher precision than the Arduino’s built-in ADC.  
+  - Low-cost and ideal for EEG data acquisition.
+
 ### :bar_chart: Reading EEG Signals
 
 Now that we've actually derived a signal from the brain, we need to extrapolate the 2 wavelengths that we want. Thats where **EEG_collection.ino** comes into play. The program reads EEG signal data from our ADS1115, removes DC offset noise, and applies a digital Butterworth bandpass filter to isolate brainwave frequencies (roughly 8–100 Hz). It then continuously outputs the raw, converted, and filtered signal values over the serial connection for analysis. Now that we've collected our data, we need to process it further. Which of course takes place in **EEG_processing.py** & **modified_eeg_processing.py**. In the original file, we establish a serial connection at 115200 baud rate on COM3 and continuously read data packets containing the readings from the previous file. We maintain 2 circular buffers with a max size of 512 samples to store the EEG data and corresponding timestamps. It runs a background thread that reads the incoming data and parses each line to extract the filtered EEG values. Then we visualize it using matplotlib to display 3 subplots in real-time using animation. The first plot shows the EEG signal amplitude in microvolts against time. The second displays the frequency spectrum computed using Fast Fourier transform with a Hanning window. The third shows bar charts representing the power levels of Gamma and Beta waves, respectively. The visualization updates every 100 milliseconds to provide a buffer but still provide near real-time feedback. 
